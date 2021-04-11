@@ -1,0 +1,30 @@
+{
+  "name": "API-RESTful-RESILA",
+  "version": "1.0.0",
+  "description": "to-do list",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Emerson-Teixeira/API-RESTful-RESILA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Emerson-Teixeira/API-RESTful-RESILA/issues"
+  },
+  "homepage": "https://github.com/Emerson-Teixeira/API-RESTful-RESILA#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "sequelize": "^6.6.2",
+    "sqlite3": "^5.0.2"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.7"
+  }
+}
