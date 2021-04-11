@@ -1,6 +1,8 @@
 # API-RESTful-RESILA
  to-do list
 
+para testar use o comando npm run start 
+
 # Requisições GET (“/api/lista”) - 
 
 Request para obter lista de tarefas, é possível obter um único item adicionando /id após lista. Também é possível Obter a lista ordenada por [ID = 0, Tarefa = 1, Descrição = 2, Dia de criaçao = 3, Dia do termino = 4], adicionando como parâmetro 'orderCol'.
