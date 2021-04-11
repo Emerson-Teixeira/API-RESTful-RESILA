@@ -1,7 +1,7 @@
 # API-RESTful-RESILA
  to-do list
 
-# Requisições GET (“/api/lista”) - 
+# Requisições GET (“/api/lista”) ou (“/api/lista/:id”) - 
 
 Request para obter lista de tarefas, é possível obter um único item adicionando /id após lista. 
 Também é possível Obter a lista ordenada por [ID = 0, Tarefa = 1, Descrição = 2, Dia de criaçao = 3, Dia do termino = 4], adicionando como parâmetro 'orderCol'.
