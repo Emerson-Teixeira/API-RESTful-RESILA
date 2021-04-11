@@ -93,11 +93,26 @@ const createQuerySelect = (tCond,cond,order,tOrder)=>{
     }).finally(db.close((err)=>{if(err) console.error(err);}))
 }
 
-const createQueryPut = (column,newValue,id)=>{
+const createQueryPatch = (column,newValue,id)=>{
     sql = `UPDATE itens set ${column} = ? WHERE _id = ?`
     var db = openConnection()
     return new Promise((resolve,reject)=>{
         db.run(sql,[newValue,id],(err)=>{
+            if(err){
+                reject(err)
+            }
+            else{
+                resolve()
+            }
+        })
+    }).finally(db.close((err)=>{if(err) console.error(err)}))
+}
+
+const createQueryPut = (params,id)=>{
+    sql = `UPDATE itens set tarefa = ?, descricao = ?, dataTermino = ?  WHERE _id = ?`
+    var db = openConnection()
+    return new Promise((resolve,reject)=>{
+        db.run(sql,[params.tarefa,params.descricao,params.dataTermino,id],(err)=>{
             if(err){
                 reject(err)
             }
@@ -113,5 +128,6 @@ module.exports = {
     createQueryAdd,
     createQueryRemove,
     createQueryPut,
-    createQuerySelect
+    createQuerySelect,
+    createQueryPatch
 }
