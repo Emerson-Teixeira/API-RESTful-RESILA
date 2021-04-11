@@ -2,7 +2,7 @@ const rotas = require('express').Router();
 var columns = ['_id','tarefa','descricao','dataTermino','dataCriado']
 var columnsAlter = ['tarefa','descricao','dataTermino']
 var direction = ['ASC','DESC']
-const {createTable,createQueryAdd,createQueryRemove,createQuerySelect, createQueryPut, createQueryPatch} = require("../database")
+const {createQueryAdd,createQueryRemove,createQuerySelect, createQueryPut, createQueryPatch} = require("../database")
 
 rotas.get("/lista/:id?",async (req,res)=>{
     //default 
@@ -13,6 +13,9 @@ rotas.get("/lista/:id?",async (req,res)=>{
     {
         try{
             var rows = await createQuerySelect(columns[0],req.params.id,orderBy,orderDirection)
+            if (rows.length<= 0){
+                return res.status(404).json({message:"Não há tarefa com esse ID no banco de dados"})
+            }
             return res.status(200).json(rows)
         }
         catch (err){
@@ -23,6 +26,9 @@ rotas.get("/lista/:id?",async (req,res)=>{
     {
         try{
             var rows = await createQuerySelect(columns[0],null,orderBy,orderDirection)
+            if (rows.length<= 0){
+                return res.status(204).json({message:"Não há tarefas no banco de dados"})
+            }
             return res.status(200).json(rows)
         }
         catch (err){
@@ -30,9 +36,6 @@ rotas.get("/lista/:id?",async (req,res)=>{
         }
     }
 })
-
-
-//Cria 1 ou varios posts
 rotas.post("/lista",async (req,res)=>{
     var msg = {
         message: "Não foi possivel adicionar o Item, verifique os dados e tente novamente",
@@ -41,11 +44,11 @@ rotas.post("/lista",async (req,res)=>{
     if(req.body){
         if(!(req.body.tarefa) || typeof req.body.tarefa  != 'string'){
             msg.Problema = 'Verifique o campo Tarefa'
-            return res.status(500).json(msg)
+            return res.status(400).json(msg)
         }
         if(!(req.body.descricao) || typeof req.body.descricao  != 'string'){
             msg.Problema = 'Verifique o campo descricao'
-            return res.status(500).json(msg)
+            return res.status(400).json(msg)
         }
         if(req.body.dataTermino){
             if(typeof req.body.dataTermino === 'string')
@@ -53,7 +56,7 @@ rotas.post("/lista",async (req,res)=>{
                 var arrayDate = req.body.dataTermino.split('-')
                     if(arrayDate.length != 3){
                          msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                         return res.status(500).json(msg)
+                         return res.status(400).json(msg)
                     }
                     else
                     {
@@ -63,7 +66,7 @@ rotas.post("/lista",async (req,res)=>{
                          }
                          else{
                             msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                            return res.status(500).json(msg)
+                            return res.status(400).json(msg)
                          }
 
                     }
@@ -71,7 +74,7 @@ rotas.post("/lista",async (req,res)=>{
             }
             else{
                 msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                return res.status(500).json(msg)
+                return res.status(400).json(msg)
             }
             
         }
@@ -85,7 +88,6 @@ rotas.post("/lista",async (req,res)=>{
         }
     }
 })
-
 rotas.put("/lista/:id",async (req,res)=>{
     var msg = {
         message: "Não foi possivel alterar o Item, verifique os dados e tente novamente",
@@ -93,14 +95,19 @@ rotas.put("/lista/:id",async (req,res)=>{
     }
     if(parseInt(req.params.id))
     {
+        var rows = await createQuerySelect(columns[0],req.params.id,columns[0] ,direction[0]).catch( err => res.status(500).json({message:'Error ao executar o processo',Error: err}) )
+        
+        if (rows.length<= 0){
+            return res.status(404).json({message:"Erro ao alterar item", Problema:'Não existe uma tarefa com esse ID'})
+        }
         if(req.body){
             if(!(req.body.tarefa) || typeof req.body.tarefa  != 'string'){
                 msg.Problema = 'Verifique o campo Tarefa'
-                return res.status(500).json(msg)
+                return res.status(400).json(msg)
             }
             if(!(req.body.descricao) || typeof req.body.descricao  != 'string'){
                 msg.Problema = 'Verifique o campo descricao'
-                return res.status(500).json(msg)
+                return res.status(400).json(msg)
             }
             if(req.body.dataTermino){
                 if(typeof req.body.dataTermino === 'string')
@@ -108,7 +115,7 @@ rotas.put("/lista/:id",async (req,res)=>{
                     var arrayDate = req.body.dataTermino.split('-')
                         if(arrayDate.length != 3){
                             msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                            return res.status(500).json(msg)
+                            return res.status(400).json(msg)
                         }
                         else
                         {
@@ -118,7 +125,7 @@ rotas.put("/lista/:id",async (req,res)=>{
                             }
                             else{
                                 msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                                return res.status(500).json(msg)
+                                return res.status(400).json(msg)
                             }
 
                         }
@@ -126,12 +133,12 @@ rotas.put("/lista/:id",async (req,res)=>{
                 }
                 else{
                     msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                    return res.status(500).json(msg)
+                    return res.status(400).json(msg)
                 }
             }
             try{
                 await createQueryPut(req.body,parseInt(req.params.id))
-                res.status(201).json({message:'Itens Alterado com sucesso'})
+                res.status(200).json({message:'Itens Alterado com sucesso'})
             }
             catch(err){
                 msg.Problema = err
@@ -141,23 +148,27 @@ rotas.put("/lista/:id",async (req,res)=>{
     }
     else
     {
-        res.status(500).json({message:"Erro ao remover item",error:'É necessario um ID para remover item'})
+        res.status(400).json({message:"Erro ao remover item",error:'É necessario um ID para remover item'})
     }
 })
 rotas.patch("/lista/:id",async (req,res)=>{
-    if(parseInt(req.params.id))
-    {
+    if(parseInt(req.params.id)){
+
+        var rows = await createQuerySelect(columns[0],req.params.id,columns[0] ,direction[0]).catch( err => res.status(500).json({message:'Error ao executar o processo',Error: err}) )
+        if (rows.length<= 0){
+            return res.status(404).json({message:"Erro ao alterar item", Problema:'Não existe uma tarefa com esse ID'})
+        }
         if(Object.keys(req.body).length == 1){
             key = Object.keys(req.body)
             if(columnsAlter.includes(key[0])){
                 content = Object.values(req.body)
                 if(typeof content[0] != 'string'){
-                    return res.status(500).json({message:"Erro ao alterar item", Problema:'O campo informado precisa conter uma string'})
+                    return res.status(400).json({message:"Erro ao alterar item", Problema:'O campo informado precisa conter uma string'})
                 }
                 if(key[0] == 'dataTermino'){
                     var arrayDate = content[0].split('-')
                         if(arrayDate.length != 3){
-                            return res.status(500).json({message:"Erro ao alterar item", Problema:'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'})
+                            return res.status(400).json({message:"Erro ao alterar item", Problema:'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'})
                         }
                         else
                         {
@@ -167,35 +178,40 @@ rotas.patch("/lista/:id",async (req,res)=>{
                             }
                             else{
                                 msg.Problema = 'Verifique o campo dataTermino(FORMATO NECESSARIO: YY-MM-DD)'
-                                return res.status(500).json(msg)
+                                return res.status(400).json(msg)
                             }
 
                         }
                 }
                 try {
                      createQueryPatch(key[0],content[0],parseInt(req.params.id))
-                     return res.status(201).json({message:'Itens Alterado com sucesso'})
+                     return res.status(200).json({message:'Itens Alterado com sucesso'})
                 } catch (error) {
                     return res.status(500).json({message:"Erro ao alterar item", Problema:error})
                 }
                
             }
             else{
-                return res.status(500).json({message:"Erro ao alterar item", Problema:'Campo Invalido'})
+                return res.status(400).json({message:"Erro ao alterar item", Problema:'Campo Invalido'})
             }
         }
         else{
-           return res.status(500).json({message:"Erro ao alterar item", Problema:'Patch só pode ser usado para alterar um campo'})
+           return res.status(400).json({message:"Erro ao alterar item", Problema:'Patch só pode ser usado para alterar um campo'})
         }
     }
     else
     {
-        res.status(500).json({message:"Erro ao remover item",error:'É necessario um ID para remover item'})
+        res.status(400).json({message:"Erro ao remover item",error:'É necessario um ID para remover item'})
     }
 })
 rotas.delete("/lista/:id",async (req,res)=>{
     if(parseInt(req.params.id))
     {
+        var rows = await createQuerySelect(columns[0],req.params.id,columns[0] ,direction[0]).catch( err => res.status(500).json({message:'Error ao executar o processo',Error: err}) )
+        
+        if (rows.length<= 0){
+            return res.status(404).json({message:"Erro ao alterar item", Problema:'Não existe uma tarefa com esse ID'})
+        }
         try{
             var rows = await createQueryRemove(parseInt(req.params.id))
             return res.status(200).json({message:'Item removido com sucesso'})
@@ -206,7 +222,7 @@ rotas.delete("/lista/:id",async (req,res)=>{
     }
     else
     {
-        res.status(500).json({message:"Erro ao remover item",error:'É necessario um ID para remover item'})
+        res.status(400).json({message:"Erro ao remover item",error:'É necessario um ID para remover item'})
     }
 })
 
