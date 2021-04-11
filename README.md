@@ -1,7 +1,7 @@
 # API-RESTful-RESILA
  to-do list
 
-para testar use o comando npm run start 
+Para testar use o comando npm run start 
 
 # Requisições GET (“/api/lista”) - 
 
