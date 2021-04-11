@@ -58,7 +58,7 @@ rotas.post("/lista",async (req,res)=>{
                     else
                     {
                          var timestamp = new Date(arrayDate[0],arrayDate[1]-1,arrayDate[2]).getTime()
-                         if(typeof timestamp == 'number'){
+                         if(!Number.isNaN(timestamp)){
                             req.body.dataTermino = timestamp
                          }
                          else{
