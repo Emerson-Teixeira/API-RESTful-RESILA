@@ -41,3 +41,7 @@ Nessa requisição o cliente passa o id de uma tarefa para ser alterada, e tamb�
 
 # Requisiçao PATCH (“/api/lista/:id”)  - 
 Nessa requisição o cliente passa o id de uma tarefa para ser alterada, no corpo o cliente deve passar um json contendo somente 1 campo que ele deseja alterar, então caso seja passado + de 1 campo o servidor responderar com um erro. 
+
+# CreateTable()
+
+Função auxiliar que verifica se há um banco e tabela itens criados.

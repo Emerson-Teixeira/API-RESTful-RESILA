@@ -27,9 +27,12 @@ rotas.get("/lista/:id?",async (req,res)=>{
         try{
             var rows = await createQuerySelect(columns[0],null,orderBy,orderDirection)
             if (rows.length<= 0){
-                return res.status(204).json({message:"Não há tarefas no banco de dados"})
+                return res.status(404).json({message:"Não há tarefas no banco de dados"})
             }
-            return res.status(200).json(rows)
+            else{
+                return res.status(200).json(rows)
+            }
+            
         }
         catch (err){
             res.status(500).json({message:'Não foi possivel obter a lista de tarefa',err:err})
